@@ -1,6 +1,6 @@
-# Vercel AI SDK, Next.js, OpenAI and shadcn-chat example
+# AWS IA Quiz
 
-This example shows how to use shadcn-chat to build a modern and fully customizable ai-powered streaming chatbot. Built at lightspeed with shadcn-chat components.
+This example shows how to use shadcn-chat to build a modern and fully customizable ai-powered streaming chatbot to study for AWS exams.
 
 
 Then run the example locally by following these steps:
