@@ -10,7 +10,6 @@ export async function POST(req: Request) {
   const allMessages = [...messages];
   const lastMessage = allMessages.pop();
 
-  console.info('calling openai("gpt-4o-mini")...');
   const result = await streamText({
     model: openai("gpt-4o-mini"),
     messages: convertToCoreMessages([
