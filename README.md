@@ -84,7 +84,7 @@ npm start or yarn start
 
 ## Screenshots
 
-![Chatbot](app/images/screenshot.png)
+![Chatbot](src/app/images/screenshot.png)
 
 ## Future Enhancements
 
