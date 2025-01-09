@@ -7,45 +7,30 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { IQuestion } from "@/lib/types";
 
 export type QuestionBoxProps = {
-  data: {
-    question: string;
-    answerChoices: {
-      answer: string;
-      isCorrect: boolean;
-      explanation: string;
-    }[];
-  };
-  messageId: string;
-  toggleCorrectAnswer: (messageId: string, add: boolean) => void;
+  data: IQuestion.default;
+  selectedAnswer?: IQuestion.QuestionChoice | null;
+  onSelectAnswer: (answer: IQuestion.QuestionChoice | null) => void;
   className?: string;
 };
 
 const QuestionBox = ({
   data,
+  selectedAnswer,
   className,
-  messageId,
-  toggleCorrectAnswer,
+  onSelectAnswer,
 }: QuestionBoxProps) => {
-  const [selectedAnswer, setSelectedAnswer] = useState<{
-    index: number;
-    answer: string;
-    isCorrect: boolean;
-    explanation: string;
-  } | null>(null);
-
   const handleSelectAnswer = (index: number) => {
-    if (index === selectedAnswer?.index) {
-      toggleCorrectAnswer(messageId, false);
-      setSelectedAnswer(null);
+    if (index.toString() === selectedAnswer?.id) {
+      onSelectAnswer(null);
       return;
     }
 
-    toggleCorrectAnswer(messageId, data.answerChoices[index]?.isCorrect);
-    setSelectedAnswer({
-      index,
+    onSelectAnswer({
       ...data.answerChoices[index],
+      id: index.toString(),
     });
   };
 
@@ -65,7 +50,7 @@ const QuestionBox = ({
             key={index}
             onClick={() => handleSelectAnswer(index)}
             className={`block w-full text-left p-2 my-2 border border-white rounded-lg text-sm focus:ring-slate-900 focus:outline-white ${
-              selectedAnswer?.index === index
+              selectedAnswer?.id === index.toString()
                 ? "bg-white text-slate-900 border-slate-900"
                 : ""
             }`}

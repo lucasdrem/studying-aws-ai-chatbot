@@ -18,15 +18,16 @@ import CodeDisplayBlock from "@/components/code-display-block";
 import QuestionBox, {
   QuestionBoxProps,
 } from "@/components/ui/chat/question-box";
+import { IQuestion } from "@/lib/types";
 
 type ChatMessageProps = {
   data: {
     role: string;
     content: string;
   };
-  messageId: string;
   isLastMessage: boolean;
   isGenerating: boolean;
+  selectedAnswer: IQuestion.QuestionChoice | null;
   onActionClick: (
     action: string,
     message: {
@@ -34,7 +35,7 @@ type ChatMessageProps = {
       content: string;
     }
   ) => void;
-  toggleCorrectAnswer: (messageId: string, add: boolean) => void;
+  onSelectAnswer: (answer: IQuestion.QuestionChoice | null) => void;
 };
 
 const ChatAiIcons = [
@@ -54,11 +55,11 @@ const ChatAiIcons = [
 
 export default function ChatMessage({
   data,
-  messageId,
   isLastMessage,
   isGenerating,
+  selectedAnswer,
   onActionClick,
-  toggleCorrectAnswer,
+  onSelectAnswer,
 }: ChatMessageProps) {
   const parseQuestionData = (data: string): QuestionBoxProps["data"][] => {
     try {
@@ -107,8 +108,8 @@ export default function ChatMessage({
                 <QuestionBox
                   data={questionData}
                   key={index}
-                  messageId={messageId}
-                  toggleCorrectAnswer={toggleCorrectAnswer}
+                  selectedAnswer={selectedAnswer}
+                  onSelectAnswer={onSelectAnswer}
                   className={index > 0 ? "mt-4" : ""}
                 />
               ))}

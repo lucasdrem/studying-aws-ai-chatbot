@@ -3,18 +3,19 @@
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
 
 import { useChat } from "ai/react";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { QuestionBoxProps } from "@/components/ui/chat/question-box";
 import FooterInput from "./components/footer-input";
 import InitialMessage from "./components/initial-message";
 import ChatMessage from "./components/chat-message";
 import QuizCounter from "./components/quiz-counter";
+import { IQuestion } from "@/lib/types";
 
 export default function ChatMessages() {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [correctAnswers, setCorrectAnswers] = useState<Record<string, boolean>>(
-    {}
-  );
+  const [selectedAnswers, setSelectedAnswers] = useState<
+    Record<string, IQuestion.QuestionChoice | null>
+  >({});
 
   const {
     messages,
@@ -82,28 +83,35 @@ export default function ChatMessages() {
     }
   };
 
-  const toggleCorrectAnswer = (messageId: string, add: boolean) => {
-    setCorrectAnswers((prev) => ({
-      ...prev,
-      [messageId]: Boolean(add),
-    }));
-  };
+  const onSelectAnswer =
+    (messageId: string) => (answer: IQuestion.QuestionChoice | null) => {
+      setSelectedAnswers((prev) => ({
+        ...prev,
+        [messageId]: answer,
+      }));
+    };
+
+  const { correctAnswers, totalQuestions } = useMemo(() => {
+    return {
+      correctAnswers: Object.values(selectedAnswers).filter(
+        (answer) => !!answer?.isCorrect
+      ).length,
+      totalQuestions: messages.filter((message) => message.role === "assistant")
+        .length,
+    };
+  }, [messages, selectedAnswers]);
 
   return (
     <Fragment>
-      <div className="py-6">
-        {/* Quiz Counter Header */}
-        {!!messages.length && (
+      {!!messages.length && (
+        <div className="py-6">
+          {/* Quiz Counter Header */}
           <QuizCounter
-            correctAnswers={
-              Object.values(correctAnswers).filter(Boolean).length
-            }
-            totalQuestions={
-              messages.filter((message) => message.role === "assistant").length
-            }
+            correctAnswers={correctAnswers}
+            totalQuestions={totalQuestions}
           />
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="flex-1 w-full overflow-y-auto" ref={messagesRef}>
         <ChatMessageList>
@@ -116,11 +124,11 @@ export default function ChatMessages() {
               <ChatMessage
                 key={index}
                 data={message}
-                messageId={index.toString()}
-                onActionClick={handleActionClick}
-                toggleCorrectAnswer={toggleCorrectAnswer}
-                isLastMessage={index === messages.length - 1}
+                selectedAnswer={selectedAnswers[index.toString()]}
                 isGenerating={isGenerating}
+                isLastMessage={index === messages.length - 1}
+                onActionClick={handleActionClick}
+                onSelectAnswer={onSelectAnswer(index.toString())}
               />
             ))}
         </ChatMessageList>
